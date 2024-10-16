@@ -1,0 +1,127 @@
+using lib_entidades.Modelos;
+using lib_repositorios;
+using lib_repositorios.Interfaces;
+using lib_utilidades;
+using Microsoft.AspNetCore.Mvc;
+
+namespace asp_servicios.Controllers
+{
+    [ApiController]
+    [Route("[controller]/[action]")]
+    public class PeluquerosController : ControllerBase
+    {
+        private IPeluquerosAplicacion? iAplicacion = null;
+
+        public PeluquerosController()
+        {
+            var conexion = new Conexion();
+            conexion.StringConnection = "server=localhost;database=db_peluqueros;uid=sa;pwd=Clas3sPrO2024_!;TrustServerCertificate=true;";
+            iAplicacion = new PeluquerosAplicacion(
+                new PeluquerosRepositorio(conexion));
+        }
+
+        private Dictionary<string, object> ObtenerDatos()
+        {
+            var datos = new StreamReader(Request.Body).ReadToEnd().ToString();
+            return JsonHelper.ConvertirAObjeto(datos);
+        }
+
+        [HttpGet]
+        public IEnumerable<Peluqueros> Get()
+        {
+            var lista = iAplicacion!.Listar();
+            return lista.ToArray();
+        }
+
+        [HttpPost]
+        public string Listar()
+        {
+            var respuesta = new Dictionary<string, object>();
+            try
+            {
+                var datos = ObtenerDatos();
+                respuesta["Entidades"] = iAplicacion!.Listar();
+                respuesta["Respuesta"] = "OK";
+                respuesta["Fecha"] = DateTime.Now.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+            catch (Exception ex)
+            {
+                respuesta["Error"] = ex.Message.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+        }
+
+        [HttpPost]
+        public string Guardar()
+        {
+            var respuesta = new Dictionary<string, object>();
+            try
+            {
+                var datos = ObtenerDatos();
+
+                var entidad = JsonHelper.ConvertirAObjeto<Peluqueros>(
+                    JsonHelper.ConvertirAString(datos["Entidad"]));
+                entidad = iAplicacion!.Guardar(entidad);
+
+                respuesta["Entidad"] = entidad;
+                respuesta["Respuesta"] = "OK";
+                respuesta["Fecha"] = DateTime.Now.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+            catch (Exception ex)
+            {
+                respuesta["Error"] = ex.Message.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+        }
+
+        [HttpPost]
+        public string Modificar()
+        {
+            var respuesta = new Dictionary<string, object>();
+            try
+            {
+                var datos = ObtenerDatos();
+
+                var entidad = JsonHelper.ConvertirAObjeto<Peluqueros>(
+                    JsonHelper.ConvertirAString(datos["Entidad"]));
+                entidad = iAplicacion!.Modificar(entidad);
+
+                respuesta["Entidad"] = entidad;
+                respuesta["Respuesta"] = "OK";
+                respuesta["Fecha"] = DateTime.Now.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+            catch (Exception ex)
+            {
+                respuesta["Error"] = ex.Message.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+        }
+
+        [HttpPost]
+        public string Borrar()
+        {
+            var respuesta = new Dictionary<string, object>();
+            try
+            {
+                var datos = ObtenerDatos();
+
+                var entidad = JsonHelper.ConvertirAObjeto<Peluqueros>(
+                    JsonHelper.ConvertirAString(datos["Entidad"]));
+                entidad = iAplicacion!.Borrar(entidad);
+
+                respuesta["Entidad"] = entidad;
+                respuesta["Respuesta"] = "OK";
+                respuesta["Fecha"] = DateTime.Now.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+            catch (Exception ex)
+            {
+                respuesta["Error"] = ex.Message.ToString();
+                return JsonHelper.ConvertirAString(respuesta);
+            }
+        }
+    }
+}
