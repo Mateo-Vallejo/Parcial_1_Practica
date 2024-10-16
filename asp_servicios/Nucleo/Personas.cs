@@ -9,6 +9,7 @@ namespace asp_servicios.Nucleo
         public string? Cedula { get; set; }
         public decimal Pago { get; set; }
         public DateTime Fecha { get; set; }
+        public string? Departamento { get; set; }
         public bool Atendido { get; set; }
     }
 }
